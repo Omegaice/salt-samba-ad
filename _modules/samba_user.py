@@ -152,6 +152,11 @@ def syncpasswords():
     """Sync the password of user accounts."""
     raise NotImplemented()
 
-def unlock():
+def unlock(name):
     """Unlock a user account."""
-    raise NotImplemented()
+    user_info = show(name)
+    if not user_info:
+        raise CommandExecutionError("User '{}' does not exist".format(name))
+    if "lockoutTime" not in user_info or user_info["lockoutTime"] == 0:
+        return True
+    return _samba_tool(["user", "unlock", name])
