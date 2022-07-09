@@ -11,6 +11,8 @@ from salt.exceptions import CommandExecutionError, NotImplemented
 import logging 
 log = logging.getLogger(__name__)
 
+__func_alias__ = {"list_": "list"}
+
 __virtualname__ = "samba_user"
 
 def __virtual__():
@@ -110,7 +112,7 @@ def get_password():
     """Get the password fields of a user/computer account."""
     raise NotImplemented()
 
-def list():
+def list_():
     """List all users."""
     return sorted(_samba_tool(["user", "list"], ignore_error=True).splitlines())
 
@@ -138,10 +140,14 @@ def set_password():
     """Set or reset the password of a user account."""
     raise NotImplemented()
 
-def set_primary_group():
+def set_primary_group(name, group):
     """Set the primary group a user account."""
-    raise NotImplemented()
-
+    if not show(name):
+        raise CommandExecutionError("User '{}' does not exist".format(name))
+    if name not in __salt__["samba_group.list_members"](group):
+        raise CommandExecutionError("User '{}' must be a member of '{}' group".format(name, group))
+    return True
+    
 def show(name):
     """Display a user AD object."""
     lines = _samba_tool(["user", "show", name], ignore_error=True).splitlines()
