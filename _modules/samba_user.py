@@ -63,7 +63,7 @@ def add():
     """Add a new user."""
     raise NotImplemented()
 
-def addunixattrs():
+def add_unixattrs():
     """Add RFC2307 attributes to a user."""
     raise NotImplemented()
 
@@ -99,11 +99,14 @@ def enable(name):
         return True
     return _samba_tool(["user", "enable", name])
 
-def getgroups():
+def get_groups(name):
     """Get the direct group memberships of a user account."""
-    raise NotImplemented()
+    user_info = show(name)
+    if not user_info:
+        raise CommandExecutionError("User '{}' does not exist".format(name))
+    return sorted(_samba_tool(["user", "getgroups", name], ignore_error=True).splitlines())
 
-def getpassword():
+def get_password():
     """Get the password fields of a user/computer account."""
     raise NotImplemented()
 
@@ -127,15 +130,15 @@ def sensitive():
     """Set/unset or show UF_NOT_DELEGATED for an account."""
     raise NotImplemented()
 
-def setexpiry():
+def set_expiry():
     """Set the expiration of a user account."""
     raise NotImplemented()
 
-def setpassword():
+def set_password():
     """Set or reset the password of a user account."""
     raise NotImplemented()
 
-def setprimarygroup():
+def set_primary_group():
     """Set the primary group a user account."""
     raise NotImplemented()
 
@@ -148,7 +151,7 @@ def show(name):
     info["userAccountControl"] = _uacToJson(int(info["userAccountControl"]))
     return info
 
-def syncpasswords():
+def sync_passwords():
     """Sync the password of user accounts."""
     raise NotImplemented()
 
